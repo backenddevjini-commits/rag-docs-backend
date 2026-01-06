@@ -45,18 +45,4 @@ FastAPI 기반 문서 질의응답 API 서버
 - pydantic
 
 ## 폴더 구조
-app/
- ├─ main.py              # FastAPI 진입점, 라우터 연결
- ├─ routers/             # API 엔드포인트
- │   ├─ health.py        # 서버 상태 체크
- │   ├─ documents.py     # 문서 업로드
- │   └─ qa.py            # 질문 응답
- ├─ services/            # 비즈니스 로직
- │   ├─ loader.py        # 문서 로딩 & 텍스트 추출
- │   ├─ embedding.py     # 임베딩 생성
- │   └─ rag.py           # RAG 통합 로직
- ├─ core/                # 공통 설정 및 환경 변수
- │   ├─ config.py        # 환경 변수 / 설정
- │   └─ llm.py           # llm 호출 관련
- └─ db/
-     └─ vector_store.py  # 벡터 DB 관련 (FAISS)
+<img width="413" height="352" alt="Image" src="https://github.com/user-attachments/assets/63301600-3632-4a16-bd03-41b89c61da88" />
