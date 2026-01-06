@@ -1,26 +1,22 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from pathlib import Path
-import uuid
+from app.services.document_service import save_document
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
-
 @router.post("/upload")
 async def upload_document(file: UploadFile = File(...)):
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="No filename")
-
-    file_id = str(uuid.uuid4())
-    file_ext = Path(file.filename).suffix
-    save_path = UPLOAD_DIR / f"{file_id}{file_ext}"
-
-    contents = await file.read()
-    save_path.write_bytes(contents)
-
-    return {
-        "id": file_id,
-        "filename": file.filename,
-        "saved_as": save_path.name
-    }
+    try:
+        result = save_document(file)
+        # 정상 응답 통일
+        return {
+            "success": True,
+            "data": result
+        }
+    
+    except ValueError as e:
+        # service에서 올라온 "비즈니스 에러"
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    except Exception:
+        # 예상하지 못한 에러
+        raise HTTPException(status_code=500, detail="Internal server error")
