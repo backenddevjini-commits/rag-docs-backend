@@ -1,6 +1,8 @@
 from pathlib import Path
 import uuid
 from fastapi import UploadFile
+from app.db.database import SessionLocal
+from app.db.models import Document
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -21,6 +23,19 @@ def save_document(file: UploadFile) -> dict:
     contents = file.file.read()
     save_path.write_bytes(contents)
 
+    db = SessionLocal()
+    try:
+        doc = Document(
+            id=file_id,
+            filename=file.filename,
+            path=str(save_path),
+            content_type=file_ext.replace(".", "")
+        )
+        db.add(doc)
+        db.commit()
+    finally:
+        db.close()
+        
     return {
         "id": file_id,
         "filename": file.filename,
