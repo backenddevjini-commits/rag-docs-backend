@@ -16,6 +16,7 @@ def save_document(file: UploadFile) -> dict:
     if not file.filename:
         raise ValueError("No filename")
     
+    # 파일 저장
     file_id = str(uuid.uuid4())
     file_ext = Path(file.filename).suffix
     save_path = UPLOAD_DIR / f"{file_id}{file_ext}"
@@ -23,6 +24,7 @@ def save_document(file: UploadFile) -> dict:
     contents = file.file.read()
     save_path.write_bytes(contents)
 
+    # DB 기록
     db = SessionLocal()
     try:
         doc = Document(
@@ -33,11 +35,16 @@ def save_document(file: UploadFile) -> dict:
         )
         db.add(doc)
         db.commit()
+        db.refresh(doc)
+
+        # 4. 결과 반환
+        return {
+            "document_id": doc.id,
+            "filename": doc.filename,
+            "content_type": doc.content_type,
+            "status": "UPLOADED"
+        }
     finally:
         db.close()
-        
-    return {
-        "id": file_id,
-        "filename": file.filename,
-        "saved_as": save_path.name
-    }
+
+    
