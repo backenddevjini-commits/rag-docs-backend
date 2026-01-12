@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./test.db"
 
     # OpenAI
-    OPENAI_API_KEY: str = ""
+    OPENAI_API_KEY: str
 
     # Logging
     LOG_LEVEL: str = "INFO"
