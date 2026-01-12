@@ -3,8 +3,6 @@ from app.core.config import settings
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
-print(settings.OPENAI_API_KEY[:10])
-
 def embed_text(text: str) -> list:
     """
     하나의 텍스트를 embedding 벡터로 변환
