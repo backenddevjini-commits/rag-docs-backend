@@ -44,7 +44,7 @@ def save_document(file: UploadFile) -> dict:
         db.commit()
         db.refresh(doc)
 
-        # 4. 결과 반환
+        # 결과 반환
         return {
             "document_id": doc.id,
             "filename": doc.filename,
