@@ -7,6 +7,13 @@ from app.db.models import Document
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+ALLOWED_EXTENSIONS = {"pdf", "txt"}
+
+def validate_file(file: UploadFile):
+    ext = file.filename.split(".")[-1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise ValueError("Unsupported file type")
+
 def save_document(file: UploadFile) -> dict:
     """
     업로드된 파일을 서버에 저장하고
