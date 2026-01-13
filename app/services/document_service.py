@@ -3,6 +3,10 @@ import uuid
 from fastapi import UploadFile
 from app.db.database import SessionLocal
 from app.db.models import Document
+from app.db.vector_store import FaissVectorStore
+from app.services.loader import extract_text
+from app.services.chunker import chunk_text
+from app.services.embedding import embed_texts
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -44,6 +48,32 @@ def save_document(file: UploadFile) -> dict:
         db.commit()
         db.refresh(doc)
 
+        # 텍스트 추출
+        text = extract_text(save_path)
+
+        # chunking
+        chunks = chunk_text(text)
+
+        # embedding
+        embeddings = embed_texts(chunks)
+
+        # metadata 생성
+        metadatas = [
+            {
+                "text": chunk,
+                "source": file_id
+            }
+            for chunk in chunks
+        ]
+
+        # FAISS 저장
+        store = FaissVectorStore(dim=len(embeddings[0]))
+        store.add(
+            embeddings=embeddings,
+            metadatas=metadatas
+        )
+        store.save()
+
         # 결과 반환
         return {
             "document_id": doc.id,
@@ -53,5 +83,3 @@ def save_document(file: UploadFile) -> dict:
         }
     finally:
         db.close()
-
-    

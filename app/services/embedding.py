@@ -1,5 +1,6 @@
 from openai import OpenAI
 from app.core.config import settings
+from typing import List
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
@@ -16,6 +17,17 @@ def embed_text(text: str) -> list:
     )
 
     return response.data[0].embedding
+
+def embed_texts(texts: List[str]) -> List[List[float]]:
+    """
+    여러 텍스트(chunk)를 embedding 벡터로 변환
+    """
+    embeddings = []
+    for text in texts:
+        if not text.strip():
+            continue
+        embeddings.append(embed_text(text))
+    return embeddings
 
 if __name__ == "__main__":
     sample = "RAG 기반 문서 Q&A 테스트 문장입니다."
