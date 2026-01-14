@@ -93,10 +93,13 @@ class FaissVectorStore:
         distance, indices = self.index.search(q, k)
 
         results = []
-        for idx in indices[0]:
+        for dist, idx in zip(distance[0], indices[0]):
             if idx == -1:
                 continue
-            results.append(self.metadata[idx])
+            results.append({
+                "distance": float(dist),
+                "metadata": self.metadata[idx]
+            })
 
         return results
     
@@ -120,19 +123,3 @@ class FaissVectorStore:
         
         with open(self.metadata_path, "r", encoding="utf-8") as f:
             return json.load(f)
-
-if __name__ == "__main__":
-    from app.services.embedding import embed_text
-
-    # 🔹 기존 index + metadata 로드
-    store = FaissVectorStore(dim=1536)  # text-embedding-3-small 기준
-
-    query = "이 문서의 주요 내용은 무엇인가?"
-    query_embedding = embed_text(query)
-
-    results = store.search(query_embedding, k=3)
-
-    print("\n=== 검색 결과 ===")
-    for i, r in enumerate(results, 1):
-        print(f"\n[{i}] source: {r.get('source')}")
-        print(r.get("text")[:200])
