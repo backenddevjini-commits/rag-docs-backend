@@ -11,8 +11,9 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
 
+    EMBEDDING_DIM: int = 1536  # OpenAI text-embedding-3-small 기준
     class Config:
         env_file = ".env"
-
+    
 
 settings = Settings()
