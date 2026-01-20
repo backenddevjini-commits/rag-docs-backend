@@ -40,12 +40,26 @@ class RagService:
     {question}
     """.strip()
 
-    def answer(self, question: str) -> str:
+    def generate_answer(self, prompt: str) -> str:
+        return self.llm.generate(prompt)
+
+    def answer(self, question: str) -> dict:
         docs = self.retrieve(question)
         prompt = self.build_prompt(question, docs)
-        return self.llm.generate(prompt)
+        answer_text = self.generate_answer(prompt)
+
+        return {
+            "question": question,
+            "answer": answer_text,
+            "sources": docs
+        }
         
 if __name__ == "__main__":
     rag = RagService()
-    answer = rag.answer("RAG의 핵심 구성 요소는 무엇인가?")
-    print(answer)
+    result = rag.answer("RAG의 핵심 구성 요소는 무엇인가?")
+
+    print("Q:", result["question"])
+    print("\nA:", result["answer"])
+    print("\n[SOURCES]")
+    for i, s in enumerate(result["sources"], start=1):
+        print(f"[{i}] distance={s['distance']:.4f}")
