@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     EMBEDDING_DIM: int = 1536  # OpenAI text-embedding-3-small 기준
+
+    DISTANCE_THRESHOLD: float = 1.0
     class Config:
         env_file = ".env"
     

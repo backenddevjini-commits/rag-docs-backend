@@ -3,7 +3,6 @@ from app.services.embedding import embed_text
 from app.core.config import settings
 from app.db.vector_store import FaissVectorStore
 from typing import List, Dict
-
 class RagService:
     def __init__(self):
         self.vector_store = FaissVectorStore(dim=settings.EMBEDDING_DIM)
@@ -26,12 +25,15 @@ class RagService:
     
     def build_prompt(self, question: str, docs: List[Dict]) -> str:
         context = "\n\n".join(
-            f" - {d['text']}" for d in docs
+            f"[문서 {i+1}]\n{d['text']}" for i, d in enumerate(docs)
         )
 
         return f"""
-    아래 문서를 참고하여 질문에 답변하시오.
-    문서에 없는 내용은 답하지 마시오.
+    너는 주어진 문서만을 기반으로 질문에 답변하는 AI이다.
+    문서에 없는 내용은 절대 추측하거나 만들어내지 마라.
+    답변할 수 없는 경우 반드시 아래 문장으로만 답하라.
+
+    "문서에 해당 정보가 없습니다."
 
     [문서]
     {context}
@@ -43,23 +45,46 @@ class RagService:
     def generate_answer(self, prompt: str) -> str:
         return self.llm.generate(prompt)
 
-    def answer(self, question: str) -> dict:
+    def answer(self, question: str, temperature: float = 0.2) -> dict:
         docs = self.retrieve(question)
+
+        if not docs:
+            return {
+                "question": question,
+                "answer": "관련 문서를 찾지 못했습니다.",
+                "sources": []
+            }
+
+        min_distance = min(doc["distance"] for doc in docs)
+
+        if min_distance > settings.DISTANCE_THRESHOLD:
+            return {
+                "question": question,
+                "answer": "문서의 관련성이 낮아 답변할 수 없습니다.",
+                "sources": []
+            }
+
         prompt = self.build_prompt(question, docs)
-        answer_text = self.generate_answer(prompt)
+        answer = self.llm.generate(prompt, temperature=temperature)
 
         return {
             "question": question,
-            "answer": answer_text,
-            "sources": docs
+            "answer": answer,
+            "temperature": temperature,
+            "sources": [
+                {"distance": d["distance"]} for d in docs
+            ]
         }
         
 if __name__ == "__main__":
     rag = RagService()
-    result = rag.answer("RAG의 핵심 구성 요소는 무엇인가?")
+    question = "RAG의 핵심 구성 요소를 한 문장으로 요약해줘"
 
-    print("Q:", result["question"])
-    print("\nA:", result["answer"])
-    print("\n[SOURCES]")
-    for i, s in enumerate(result["sources"], start=1):
-        print(f"[{i}] distance={s['distance']:.4f}")
+    for t in [0.0, 0.3, 0.7]:
+        print("\n" + "=" * 50)
+        print(f"TEMPERATURE = {t}")
+
+        result = rag.answer(question, temperature=t)
+
+        print("Q:", result["question"])
+        print("A:", result["answer"])
