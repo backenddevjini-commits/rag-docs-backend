@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from app.routers.health import router as health_router
 from app.routers.documents import router as documents_router
+from app.routers.users import router as users_router
 from app.db.database import engine, Base
 from app.db import models
 
@@ -24,3 +25,4 @@ Base.metadata.create_all(bind=engine)
 # 라우터 등록
 app.include_router(health_router)
 app.include_router(documents_router)
+app.include_router(users_router)
