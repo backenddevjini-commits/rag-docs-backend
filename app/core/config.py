@@ -14,6 +14,12 @@ class Settings(BaseSettings):
     EMBEDDING_DIM: int = 1536  # OpenAI text-embedding-3-small 기준
 
     DISTANCE_THRESHOLD: float = 1.0
+
+    # JWT
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
     class Config:
         env_file = ".env"
     
