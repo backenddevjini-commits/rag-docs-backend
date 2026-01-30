@@ -70,14 +70,17 @@ FastAPI 기반 문서 질의응답 API 서버
   "email": "user@example.com",
   "password": "비밀번호"
 }
+```
 
 응답 예시:
 
+```json
 {
   "id": 1,
   "email": "user@example.com",
   "created_at": "2026-01-29T06:37:47.037623"
 }
+```
 
 ### 로그인
 
@@ -90,10 +93,12 @@ password=비밀번호
 
 응답 예시:
 
+```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "bearer"
 }
+```
 
 ### 현재 사용자 조회
 
@@ -105,16 +110,19 @@ Authorization: Bearer <access_token>
 
 응답 예시:
 
+```json
 {
   "id": 1,
   "email": "user@example.com",
   "created_at": "2026-01-29T06:37:47.037623"
 }
+```
 
 ### 예외 처리
 - 잘못된 토큰/만료 → 401 Unauthorized
 - JSON 형식:
 
+```json
 {
   "success": false,
   "error": {
@@ -122,6 +130,7 @@ Authorization: Bearer <access_token>
     "message": "Invalid token"
   }
 }
+```
 
 - 주의 사항
 1. /users/login은 OAuth2PasswordRequestForm 기반이라 Swagger에서는 username 칸에 이메일을 넣어야 함.
