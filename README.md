@@ -88,8 +88,10 @@ FastAPI 기반 문서 질의응답 API 서버
 
 폼 데이터 (Swagger 기준 OAuth2PasswordRequestForm 사용):
 
+```
 username=user@example.com
 password=비밀번호
+```
 
 응답 예시:
 
@@ -105,9 +107,9 @@ password=비밀번호
 **GET /users/me**
 
 헤더:
-
+```
 Authorization: Bearer <access_token>
-
+```
 응답 예시:
 
 ```json
